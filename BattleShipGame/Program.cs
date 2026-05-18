@@ -14,6 +14,7 @@ namespace BattleShipGame
             builder.Services.AddControllers();
             builder.Services.AddOpenApi();
             builder.Services.AddScoped<ISessionRepository, SessionRepository>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
 
             var app = builder.Build();
 
