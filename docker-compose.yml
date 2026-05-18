@@ -1,0 +1,28 @@
+﻿services:
+  api:
+    build: 
+      context: .
+      dockerfile: BattleShipGame/Dockerfile
+    ports: 
+      - "5000:8080" 
+    depends_on:
+      - db  
+    restart: always
+  db:
+    image: mariadb
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: userdb
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8081:8080
+volumes:
+  mariadb_data:
