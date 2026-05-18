@@ -1,9 +1,10 @@
-
+using BattleShipGame.Data;
 using BattleShipGame.Dtos;
 using BattleShipGame.Interfaces;
 using BattleShipGame.Models;
 using BattleShipGame.Profiles;
 using BattleShipGame.Repositiories;
+using Microsoft.EntityFrameworkCore;
 
 namespace BattleShipGame
 {
@@ -13,14 +14,23 @@ namespace BattleShipGame
         {
             var builder = WebApplication.CreateBuilder(args);
 
-
             builder.Services.AddControllers();
             builder.Services.AddOpenApi();
             builder.Services.AddScoped<ISessionRepository, SessionRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
-            builder.Services.AddAutoMapper(cfg => {
-                cfg.CreateMap<User, UserDto>();
-            }, typeof(UserProfile));
+            builder.Services.AddAutoMapper(
+                cfg =>
+                {
+                    cfg.CreateMap<User, UserDto>();
+                },
+                typeof(UserProfile)
+            );
+            builder.Services.AddDbContext<UserDbContext>(options =>
+                options.UseMySql(
+                    builder.Configuration.GetConnectionString("default"),
+                    ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("default"))
+                )
+            );
 
             var app = builder.Build();
 
@@ -32,7 +42,6 @@ namespace BattleShipGame
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 
