@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using BattleShipGame.Dtos;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BattleShipGame.Controllers
@@ -7,6 +9,11 @@ namespace BattleShipGame.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
+        private readonly IMapper _mapper;
+        public UserController(IMapper mapper)
+        {
+            _mapper = mapper;
+        }
         [HttpGet("{id}")]
         public IActionResult GetUser(int id)
         {

@@ -1,5 +1,8 @@
 
+using BattleShipGame.Dtos;
 using BattleShipGame.Interfaces;
+using BattleShipGame.Models;
+using BattleShipGame.Profiles;
 using BattleShipGame.Repositiories;
 
 namespace BattleShipGame
@@ -15,6 +18,9 @@ namespace BattleShipGame
             builder.Services.AddOpenApi();
             builder.Services.AddScoped<ISessionRepository, SessionRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddAutoMapper(cfg => {
+                cfg.CreateMap<User, UserDto>();
+            }, typeof(UserProfile));
 
             var app = builder.Build();
 
