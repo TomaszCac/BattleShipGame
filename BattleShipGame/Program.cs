@@ -1,4 +1,7 @@
 
+using BattleShipGame.Interfaces;
+using BattleShipGame.Repositiories;
+
 namespace BattleShipGame
 {
     public class Program
@@ -10,6 +13,7 @@ namespace BattleShipGame
 
             builder.Services.AddControllers();
             builder.Services.AddOpenApi();
+            builder.Services.AddScoped<ISessionRepository, SessionRepository>();
 
             var app = builder.Build();
 
