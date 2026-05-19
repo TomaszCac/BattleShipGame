@@ -20,8 +20,7 @@ namespace BattleShipGame.Profiles
         {
             var user = new User();
             var passwordHasher = new PasswordHasher<User>();
-            user.Id = source.Id;
-            user.Name = source.Name;
+            user.UserName = source.UserName;
             user.Wins = 0;
             user.Losses = 0;
             user.PasswordHash = passwordHasher.HashPassword(user, source.Password);
