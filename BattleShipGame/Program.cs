@@ -4,6 +4,8 @@ using BattleShipGame.Interfaces;
 using BattleShipGame.Models;
 using BattleShipGame.Profiles;
 using BattleShipGame.Repositiories;
+using BattleShipGame.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace BattleShipGame
@@ -18,6 +20,11 @@ namespace BattleShipGame
             builder.Services.AddOpenApi();
             builder.Services.AddScoped<ISessionRepository, SessionRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IUserService, UserService>();
+
+            builder
+                .Services.AddIdentity<User, IdentityRole>()
+                .AddEntityFrameworkStores<UserDbContext>();
             builder.Services.AddAutoMapper(
                 cfg =>
                 {
