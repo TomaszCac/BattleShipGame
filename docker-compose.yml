@@ -1,5 +1,6 @@
-﻿services:
+services:
   api:
+    image: ${DOCKER_REGISTRY-}battleshipgame
     build: 
       context: .
       dockerfile: BattleShipGame/Dockerfile
