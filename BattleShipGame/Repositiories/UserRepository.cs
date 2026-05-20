@@ -42,7 +42,6 @@ namespace BattleShipGame.Repositiories
         {
             var currentUser = await _userManager.FindByIdAsync(user.Id);
             currentUser.UserName = user.UserName;
-            currentUser.PasswordHash = user.PasswordHash;
             return await _userManager.UpdateAsync(currentUser) == IdentityResult.Success;
         }
     }
