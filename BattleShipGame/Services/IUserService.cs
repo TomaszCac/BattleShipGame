@@ -4,7 +4,8 @@ namespace BattleShipGame.Services
 {
     public interface IUserService
     {
-        public bool Login(User user, string password);
+        public string? Login(User user, string password);
+        public string GenerateToken(User user);
 
     }
 }

@@ -5,8 +5,11 @@ using BattleShipGame.Models;
 using BattleShipGame.Profiles;
 using BattleShipGame.Repositiories;
 using BattleShipGame.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace BattleShipGame
 {
@@ -38,6 +41,17 @@ namespace BattleShipGame
                     ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("default"))
                 )
             );
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options => {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = "BattleShipGameApi",
+                    ValidAudience = "BattleShipGameApi-client",
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("Token:Key").Value))
+                }; });
 
             var app = builder.Build();
 
