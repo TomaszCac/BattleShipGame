@@ -1,8 +1,8 @@
-﻿using BattleShipGame.Interfaces;
-using BattleShipGame.Models;
+﻿using BattleShipGame.Application.Interfaces;
+using BattleShipGame.Domain.Entities;
 using Newtonsoft.Json;
 
-namespace BattleShipGame.Repositiories
+namespace BattleShipGame.Infrastructure.Repositiories
 {
     public class SessionRepository : ISessionRepository
     {

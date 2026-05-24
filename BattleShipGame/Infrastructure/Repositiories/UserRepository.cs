@@ -1,9 +1,10 @@
-﻿using BattleShipGame.Data;
-using BattleShipGame.Interfaces;
-using BattleShipGame.Models;
+﻿using BattleShipGame.Application.Common;
+using BattleShipGame.Application.Interfaces;
+using BattleShipGame.Domain.Entities;
+using BattleShipGame.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 
-namespace BattleShipGame.Repositiories
+namespace BattleShipGame.Infrastructure.Repositiories
 {
     public class UserRepository : IUserRepository
     {
@@ -16,10 +17,13 @@ namespace BattleShipGame.Repositiories
             _userManager = userManager;
         }
 
-        public async Task<bool> CreateUserAsync(User user, string password)
+        public async Task<Result<IdentityError[]>> CreateUserAsync(User user, string password)
         {
-            var result = await _userManager.CreateAsync(user, password);
-            return  result == IdentityResult.Success;
+
+            var dbResult = await _userManager.CreateAsync(user, password);
+            Result<IdentityError[]> result = new Result<IdentityError[]>(dbResult == IdentityResult.Success);
+            result.Errors = dbResult.Errors.ToArray();
+            return result;
         }
 
         public async Task<bool> DeleteUserAsync(string id)

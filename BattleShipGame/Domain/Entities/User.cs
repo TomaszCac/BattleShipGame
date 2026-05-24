@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace BattleShipGame.Models
+namespace BattleShipGame.Domain.Entities
 {
     public class User : IdentityUser
     {

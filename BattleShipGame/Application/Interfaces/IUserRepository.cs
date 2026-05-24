@@ -1,15 +1,16 @@
-﻿using BattleShipGame.Models;
+﻿using BattleShipGame.Application.Common;
+using BattleShipGame.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 
-namespace BattleShipGame.Interfaces
+namespace BattleShipGame.Application.Interfaces
 {
     public interface IUserRepository
     {
-        public Task<bool> CreateUserAsync(User user, string password);
+        public Task<Result<IdentityError[]>> CreateUserAsync(User user, string password);
         public Task<User?> GetUserByIdAsync(string id);
         public Task<User?> GetUserByUserNameAsync(string userName);
 
         public Task<bool> UpdateUserAsync(User user);
         public Task<bool> DeleteUserAsync(string id);
-
     }
 }

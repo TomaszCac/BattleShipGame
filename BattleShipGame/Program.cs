@@ -1,15 +1,16 @@
-using BattleShipGame.Data;
-using BattleShipGame.Dtos;
-using BattleShipGame.Interfaces;
-using BattleShipGame.Models;
-using BattleShipGame.Profiles;
-using BattleShipGame.Repositiories;
-using BattleShipGame.Services;
+using System.Text;
+using BattleShipGame.Application.Dtos;
+using BattleShipGame.Application.Interfaces;
+using BattleShipGame.Application.Mapping;
+using BattleShipGame.Application.Services;
+using BattleShipGame.Domain.Entities;
+using BattleShipGame.Infrastructure.Auth;
+using BattleShipGame.Infrastructure.Persistence;
+using BattleShipGame.Infrastructure.Repositiories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
 
 namespace BattleShipGame
 {
@@ -24,6 +25,7 @@ namespace BattleShipGame
             builder.Services.AddScoped<ISessionRepository, SessionRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 
             builder
                 .Services.AddIdentity<User, IdentityRole>()
@@ -41,17 +43,29 @@ namespace BattleShipGame
                     ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("default"))
                 )
             );
-            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options => {
-                options.TokenValidationParameters = new TokenValidationParameters
+            builder
+                .Services.AddAuthentication(options =>
                 {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = "BattleShipGameApi",
-                    ValidAudience = "BattleShipGameApi-client",
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("Token:Key").Value))
-                }; });
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = "BattleShipGameApi",
+                        ValidAudience = "BattleShipGameApi-client",
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(
+                                builder.Configuration.GetSection("Token:Key").Value
+                            )
+                        ),
+                    };
+                });
 
             var app = builder.Build();
 
@@ -61,9 +75,9 @@ namespace BattleShipGame
             }
 
             app.UseHttpsRedirection();
+            app.UseAuthentication();
 
             app.UseAuthorization();
-
             app.MapControllers();
 
             app.Run();

@@ -1,8 +1,8 @@
-﻿using BattleShipGame.Models;
+﻿using BattleShipGame.Domain.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace BattleShipGame.Data
+namespace BattleShipGame.Infrastructure.Persistence
 {
     public class UserDbContext : IdentityDbContext<User>
     {

@@ -1,9 +1,8 @@
 ﻿using AutoMapper;
-using BattleShipGame.Dtos;
-using BattleShipGame.Models;
-using Microsoft.AspNetCore.Identity;
+using BattleShipGame.Application.Dtos;
+using BattleShipGame.Domain.Entities;
 
-namespace BattleShipGame.Profiles
+namespace BattleShipGame.Application.Mapping
 {
     public class UserProfile : Profile
     {

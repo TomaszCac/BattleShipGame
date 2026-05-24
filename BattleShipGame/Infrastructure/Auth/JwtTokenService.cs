@@ -1,29 +1,19 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using BattleShipGame.Application.Interfaces;
+using BattleShipGame.Domain.Entities;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using BattleShipGame.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
 
-namespace BattleShipGame.Services
+namespace BattleShipGame.Infrastructure.Auth
 {
-    public class UserService : IUserService
+    public class JwtTokenService : IJwtTokenService
     {
         private readonly string _jwtKey;
 
-        public UserService(IConfiguration configuration)
+        public JwtTokenService(IConfiguration configuration)
         {
             _jwtKey = configuration.GetSection("Token:Key").Value;
-        }
-
-        public string? Login(User user, string password)
-        {
-            var hasher = new PasswordHasher<User>();
-            var result = hasher.VerifyHashedPassword(user, user.PasswordHash, password);
-            if (result == PasswordVerificationResult.Success)
-                return GenerateToken(user);
-            else
-                return null;
         }
 
         public string GenerateToken(User user)
@@ -32,6 +22,8 @@ namespace BattleShipGame.Services
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var token = new JwtSecurityToken(
+                issuer: "BattleShipGameApi",
+                audience: "BattleShipGameApi-client",
                 claims: claims,
                 expires: DateTime.Now.AddHours(2),
                 signingCredentials: creds

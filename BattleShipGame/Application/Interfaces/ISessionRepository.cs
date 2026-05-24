@@ -1,6 +1,6 @@
-﻿using BattleShipGame.Models;
+﻿using BattleShipGame.Domain.Entities;
 
-namespace BattleShipGame.Interfaces
+namespace BattleShipGame.Application.Interfaces
 {
     public interface ISessionRepository
     {

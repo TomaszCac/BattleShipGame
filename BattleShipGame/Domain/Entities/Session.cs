@@ -1,4 +1,4 @@
-﻿namespace BattleShipGame.Models
+﻿namespace BattleShipGame.Domain.Entities
 {
     public class Session
     {

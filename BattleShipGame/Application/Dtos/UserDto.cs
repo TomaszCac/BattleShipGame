@@ -1,4 +1,4 @@
-﻿namespace BattleShipGame.Dtos
+﻿namespace BattleShipGame.Application.Dtos
 {
     public class UserDto
     {
