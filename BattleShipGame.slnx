@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="BattleShipGame/BattleShipGame.csproj" />
+  <Project Path="BattleShipGame_Frontend/BattleShipGame_Frontend.csproj" Id="65be7e9c-3a8b-456e-8544-c6f67bd7c017" />
   <Project Path="docker-compose.dcproj">
     <Build />
   </Project>
