@@ -9,6 +9,5 @@
 
         public bool Success { get; set; }
         public T? Errors { get; set; }
-
     }
 }

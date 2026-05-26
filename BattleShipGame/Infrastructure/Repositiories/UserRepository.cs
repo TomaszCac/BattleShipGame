@@ -19,9 +19,10 @@ namespace BattleShipGame.Infrastructure.Repositiories
 
         public async Task<Result<IdentityError[]>> CreateUserAsync(User user, string password)
         {
-
             var dbResult = await _userManager.CreateAsync(user, password);
-            Result<IdentityError[]> result = new Result<IdentityError[]>(dbResult == IdentityResult.Success);
+            Result<IdentityError[]> result = new Result<IdentityError[]>(
+                dbResult == IdentityResult.Success
+            );
             result.Errors = dbResult.Errors.ToArray();
             return result;
         }
@@ -42,11 +43,16 @@ namespace BattleShipGame.Infrastructure.Repositiories
             return await _userManager.FindByNameAsync(userName);
         }
 
-        public async Task<bool> UpdateUserAsync(User user)
+        public async Task<Result<IdentityError[]>> UpdateUserAsync(User user)
         {
             var currentUser = await _userManager.FindByIdAsync(user.Id);
             currentUser.UserName = user.UserName;
-            return await _userManager.UpdateAsync(currentUser) == IdentityResult.Success;
+            var dbResult = await _userManager.UpdateAsync(currentUser);
+            Result<IdentityError[]> result = new Result<IdentityError[]>(
+                dbResult == IdentityResult.Success
+            );
+            result.Errors = dbResult.Errors.ToArray();
+            return result;
         }
     }
 }

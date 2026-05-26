@@ -4,6 +4,7 @@ using BattleShipGame.Application.Interfaces;
 using BattleShipGame.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace BattleShipGame.Api.Controllers
 {
@@ -29,7 +30,7 @@ namespace BattleShipGame.Api.Controllers
         public async Task<IActionResult> GetUserByName(string name)
         {
             if (string.IsNullOrEmpty(name))
-                return BadRequest("Name is empty");
+                return BadRequest("User Name is empty");
             var user = await _userRepos.GetUserByUserNameAsync(name);
             if (user != null)
                 return Ok(_mapper.Map<UserDto>(user));
@@ -43,7 +44,7 @@ namespace BattleShipGame.Api.Controllers
         public async Task<IActionResult> GetUserById(string id)
         {
             if (string.IsNullOrEmpty(id))
-                return BadRequest("ID is empty");
+                return BadRequest("User ID is empty");
             var user = await _userRepos.GetUserByIdAsync(id);
             if (user != null)
                 return Ok(_mapper.Map<UserDto>(user));
@@ -58,43 +59,64 @@ namespace BattleShipGame.Api.Controllers
         {
             if (!string.IsNullOrEmpty(user.UserName) && !string.IsNullOrEmpty(user.Password))
             {
-                var result = await _userRepos.CreateUserAsync(_mapper.Map<User>(user), user.Password);
+                var result = await _userRepos.CreateUserAsync(
+                    _mapper.Map<User>(user),
+                    user.Password
+                );
                 if (result.Success)
                 {
                     return Ok("User registered successfully");
                 }
-                if(result.Errors.Any(e => e.Code == "DuplicateUserName"))
+                if (result.Errors.Any(e => e.Code == "DuplicateUserName"))
                 {
-                    return Conflict("Username already taken");
+                    return Conflict("User Name already taken");
                 }
-                return BadRequest(result.Errors.Select(e => e.Description));
+                return BadRequest(JsonConvert.SerializeObject(result.Errors));
             }
             return BadRequest("User data is not complete");
         }
 
         [HttpPost("login")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Login([FromBody] UserDto userDto)
         {
-            return Ok(
-                _userService.Login(
-                    await _userRepos.GetUserByUserNameAsync(userDto.UserName),
-                    userDto.Password
-                )
-            );
+            if (!string.IsNullOrEmpty(userDto.UserName) && !string.IsNullOrEmpty(userDto.Password))
+            {
+                var userResult = await _userRepos.GetUserByUserNameAsync(userDto.UserName);
+
+                if (userResult != null)
+                {
+                    var loginResult = _userService.Login(userResult, userDto.Password);
+                    if (loginResult != null)
+                        return Ok(loginResult);
+                }
+
+                return BadRequest("Wrong password or username");
+            }
+            return BadRequest("User data is not complete");
         }
 
-        [HttpDelete("{id}"), Authorize]
-        public async Task<IActionResult> DeleteUser(string id)
+        [HttpDelete, Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> DeleteUser()
         {
-            return Ok(await _userRepos.DeleteUserAsync(id));
+            return Ok(await _userRepos.DeleteUserAsync(_userService.GetId()));
         }
 
-        [HttpPut("{id}"), Authorize]
-        public async Task<IActionResult> UpdateUser([FromBody] UserDto user, string id)
+        [HttpPut, Authorize]
+        public async Task<IActionResult> UpdateUser([FromBody] UserDto user)
         {
-            var modifiedUser = _mapper.Map<User>(user);
-            modifiedUser.Id = id;
-            return Ok(await _userRepos.UpdateUserAsync(modifiedUser));
+            if (!string.IsNullOrEmpty(user.UserName))
+            {
+                var modifiedUser = _mapper.Map<User>(user);
+                modifiedUser.Id = _userService.GetId();
+                var result = await _userRepos.UpdateUserAsync(modifiedUser);
+                if (result.Success)
+                    return Ok("User updated successfully");
+                return BadRequest(JsonConvert.SerializeObject(result.Errors));
+            }
+            return BadRequest("User data is not complete");
         }
     }
 }
