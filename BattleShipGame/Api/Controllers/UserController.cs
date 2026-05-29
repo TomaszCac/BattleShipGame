@@ -96,6 +96,15 @@ namespace BattleShipGame.Api.Controllers
             }
             return BadRequest("User data is not complete");
         }
+        [HttpGet("current"), Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            return Ok(
+                _mapper.Map<UserDto>(await _userRepos.GetUserByIdAsync(_userService.GetId()))
+            );
+        }
+
 
         [HttpDelete, Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
