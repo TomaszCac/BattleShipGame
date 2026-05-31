@@ -10,11 +10,11 @@ using Microsoft.VisualBasic.ApplicationServices;
 
 namespace BattleShipGame_Frontend
 {
-    public partial class MainMenuWindow : Form
+    public partial class LoginWindow : Form
     {
         private readonly TokenService _tokenService;
 
-        public MainMenuWindow(TokenService tokenService)
+        public LoginWindow(TokenService tokenService)
         {
             _tokenService = tokenService;
             InitializeComponent();

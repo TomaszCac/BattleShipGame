@@ -1,6 +1,6 @@
 ﻿namespace BattleShipGame_Frontend
 {
-    partial class MainMenuWindow
+    partial class LoginWindow
     {
         private System.ComponentModel.IContainer components = null;
 

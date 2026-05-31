@@ -10,7 +10,7 @@ namespace BattleShipGame_Frontend
         {
             var tokenService = new TokenService();
             ApplicationConfiguration.Initialize();
-            Application.Run(new MainMenuWindow(tokenService));
+            Application.Run(new LoginWindow(tokenService));
         }
     }
 }
