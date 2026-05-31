@@ -93,7 +93,7 @@
             // ForgotLinkLabel
             // 
             ForgotLinkLabel.AutoSize = true;
-            ForgotLinkLabel.Location = new Point(723, 558);
+            ForgotLinkLabel.Location = new Point(723, 552);
             ForgotLinkLabel.Name = "ForgotLinkLabel";
             ForgotLinkLabel.Size = new Size(100, 15);
             ForgotLinkLabel.TabIndex = 10;
@@ -115,7 +115,7 @@
             // 
             StatusLabel.AutoSize = true;
             StatusLabel.Font = new Font("Segoe UI", 12F);
-            StatusLabel.Location = new Point(544, 201);
+            StatusLabel.Location = new Point(37, 214);
             StatusLabel.Name = "StatusLabel";
             StatusLabel.Size = new Size(0, 21);
             StatusLabel.TabIndex = 12;

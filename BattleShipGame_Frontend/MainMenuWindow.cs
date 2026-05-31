@@ -20,7 +20,12 @@ namespace BattleShipGame_Frontend
             InitializeComponent();
         }
 
-        private void RegisterButton_Click(object sender, EventArgs e) { }
+        private void RegisterButton_Click(object sender, EventArgs e)
+        {
+            var button = (Button)sender;
+            button.Enabled = false;
+            RegisterUser(ConnectionClient.sharedClient);
+        }
 
         private async void LoginButton_Click(object sender, EventArgs e)
         {
@@ -72,6 +77,49 @@ namespace BattleShipGame_Frontend
             {
                 StatusLabel.Text = responseOutput;
                 return null;
+            }
+        }
+
+        private async void RegisterUser(HttpClient httpClient)
+        {
+            var user = new Models.User()
+            {
+                Id = "0",
+                UserName = UsernameTextBox.Text,
+                Password = PasswordTextBox.Text,
+                Wins = 0,
+                Losses = 0,
+            };
+            using StringContent jsonContent = new(
+                JsonSerializer.Serialize(user),
+                Encoding.UTF8,
+                "application/json"
+            );
+            StatusLabel.Text = "Connecting...";
+            using HttpResponseMessage response = await httpClient.PostAsync(
+                "user/register",
+                jsonContent
+            );
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                StatusLabel.Text = await response.Content.ReadAsStringAsync();
+            }
+            else if (response.StatusCode == HttpStatusCode.Conflict)
+            {
+                StatusLabel.Text = await response.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                List<Result>? responseResultOutput = await response.Content.ReadFromJsonAsync<
+                    List<Result>
+                >();
+                var errors = responseResultOutput.Select(b => b.Description);
+                StatusLabel.Text = "Registration failed";
+                foreach (var error in errors)
+                {
+                    StatusLabel.Text += $"\n {error}";
+                }
+                RegisterButton.Enabled = true;
             }
         }
 
