@@ -22,21 +22,14 @@ namespace BattleShipGame
 
             builder.Services.AddControllers();
             builder.Services.AddOpenApi();
-            builder.Services.AddScoped<ISessionRepository, SessionRepository>();
+            builder.Services.AddSingleton<ISessionRepository, SessionRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
-
             builder
                 .Services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<UserDbContext>();
-            builder.Services.AddAutoMapper(
-                cfg =>
-                {
-                    cfg.CreateMap<User, UserDto>();
-                },
-                typeof(UserProfile)
-            );
+            builder.Services.AddAutoMapper(cfg => { }, typeof(UserProfile), typeof(SessionProfile));
             builder.Services.AddDbContext<UserDbContext>(options =>
                 options.UseMySql(
                     builder.Configuration.GetConnectionString("default"),

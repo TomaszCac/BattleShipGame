@@ -1,5 +1,9 @@
-﻿using BattleShipGame.Application.Interfaces;
+﻿using AutoMapper;
+using BattleShipGame.Application.Dtos;
+using BattleShipGame.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace BattleShipGame.Api.Controllers
 {
@@ -9,20 +13,30 @@ namespace BattleShipGame.Api.Controllers
     {
         private readonly ISessionRepository _sessionRepos;
         private readonly IUserRepository _userRepos;
+        private readonly IMapper _mapper;
+        private readonly IUserService _userService;
 
         public SessionController(
             ISessionRepository sessionRepository,
-            IUserRepository userRepository
+            IUserRepository userRepository,
+            IMapper mapper,
+            IUserService userService
         )
         {
             _sessionRepos = sessionRepository;
             _userRepos = userRepository;
+            _mapper = mapper;
+            _userService = userService;
         }
 
         [HttpGet]
         public IActionResult GetAllSessions()
         {
-            return Ok();
+            return Ok(
+                JsonConvert.SerializeObject(
+                    _mapper.Map<List<SessionDto>>(_sessionRepos.GetAvailableSessions())
+                )
+            );
         }
 
         [HttpGet("{id}")]
@@ -31,16 +45,17 @@ namespace BattleShipGame.Api.Controllers
             return Ok(_sessionRepos.GetSession(id));
         }
 
-        [HttpPost]
-        public IActionResult CreateSession()
+        [HttpPost, Authorize]
+        public async Task<IActionResult> CreateSession()
         {
-            return Ok();
+            var user = await _userRepos.GetUserByIdAsync(_userService.GetId());
+            return Ok(_sessionRepos.CreateSession(user));
         }
 
         [HttpDelete]
         public IActionResult DeleteSession(int id)
         {
-            return Ok();
+            return Ok(_sessionRepos.RemoveSession(id));
         }
     }
 }
