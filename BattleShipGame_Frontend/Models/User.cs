@@ -4,7 +4,7 @@ using System.Text;
 
 namespace BattleShipGame_Frontend.Models
 {
-    internal class User
+    public class User
     {
         public string Id { get; set; }
         public string UserName { get; set; }

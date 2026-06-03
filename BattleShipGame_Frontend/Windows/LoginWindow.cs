@@ -6,6 +6,7 @@ using System.Text.Json;
 using BattleShipGame_Frontend.Configuration;
 using BattleShipGame_Frontend.Models;
 using BattleShipGame_Frontend.Services;
+using BattleShipGame_Frontend.Windows;
 using Microsoft.VisualBasic.ApplicationServices;
 
 namespace BattleShipGame_Frontend
@@ -39,9 +40,10 @@ namespace BattleShipGame_Frontend
                 var user = await GetUser(ConnectionClient.sharedClient);
 
                 await Task.Delay(2000);
-                MessageBox.Show(
-                    $"Id:{user.Id}, Username:{user.UserName}, Password: {user.Password}, Wins: {user.Wins}, Losses: {user.Losses} "
-                );
+                MenuWindow menuWindow = new(user, _tokenService);
+                menuWindow.Location = new Point(this.Location.X, this.Location.Y);
+                menuWindow.Show();
+                this.Close();
             }
         }
 
