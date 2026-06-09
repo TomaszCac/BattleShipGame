@@ -50,6 +50,7 @@
             BackButton.TabIndex = 2;
             BackButton.Text = "Back";
             BackButton.UseVisualStyleBackColor = true;
+            BackButton.Click += BackButton_Click;
             // 
             // RefreshButton
             // 
@@ -59,6 +60,7 @@
             RefreshButton.TabIndex = 3;
             RefreshButton.Text = "Refresh";
             RefreshButton.UseVisualStyleBackColor = true;
+            RefreshButton.Click += this.RefreshButton_Click;
             // 
             // StatusLabel
             // 

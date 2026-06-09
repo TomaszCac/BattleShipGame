@@ -1,6 +1,7 @@
 ﻿using BattleShipGame_Frontend.Configuration;
 using BattleShipGame_Frontend.Models;
 using BattleShipGame_Frontend.Services;
+using BattleShipGame_Frontend.Windows;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -78,6 +79,21 @@ namespace BattleShipGame_Frontend
             Session session = JsonConvert.DeserializeObject<Session>(stringContent);
             
             MessageBox.Show($"{session.Id.ToString()}, {session.Host.UserName}, {session.Guest.UserName}");
+        }
+        private async void BackButton_Click(Object sender, EventArgs e)
+        {
+            MenuWindow menuWindow = new(_currentUser, _tokenService);
+            menuWindow.Show();
+            this.Close();
+        }
+        private async void RefreshButton_Click(Object sender, EventArgs e)
+        {
+            using HttpResponseMessage response = await ConnectionClient.sharedClient.GetAsync(
+               "session"
+           );
+            var stringContent = await response.Content.ReadAsStringAsync();
+            _sessions = JsonConvert.DeserializeObject<List<Session>>(stringContent);
+            InsertSessions();
         }
 
     }
