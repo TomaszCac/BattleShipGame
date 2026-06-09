@@ -1,8 +1,10 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json.Serialization;
 using BattleShipGame_Frontend.Configuration;
 using BattleShipGame_Frontend.Models;
 using BattleShipGame_Frontend.Services;
+using Newtonsoft.Json;
 
 namespace BattleShipGame_Frontend.Windows
 {
@@ -19,17 +21,21 @@ namespace BattleShipGame_Frontend.Windows
             LossesLabel.Text = $"Losses: {user.Losses}";
         }
 
-        private void JoinGameButton_Click(object sender, EventArgs e)
+        private async void JoinGameButton_Click(object sender, EventArgs e)
         {
             var button = (Button)sender;
             button.Enabled = false;
-            ListSessions(ConnectionClient.sharedClient);
+            var sessions = await ListSessions(ConnectionClient.sharedClient);
+            SessionsWindow sessionsWindow = new(sessions, _tokenService);
+            sessionsWindow.Show();
+            this.Close();
+
         }
 
-        private async void ListSessions(HttpClient httpClient)
+        private async Task<List<Session>> ListSessions(HttpClient httpClient)
         {
             using HttpResponseMessage response = await httpClient.GetAsync("session");
-            MessageBox.Show(await response.Content.ReadAsStringAsync());
+            return JsonConvert.DeserializeObject<List<Session>>(await response.Content.ReadAsStringAsync());
         }
 
         private async void CreateGameButton_Click(object sender, EventArgs e) {
