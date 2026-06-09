@@ -11,14 +11,16 @@ namespace BattleShipGame_Frontend.Windows
     public partial class MenuWindow : Form
     {
         private readonly TokenService _tokenService;
+        private readonly User _currentUser;
 
         public MenuWindow(User user, TokenService tokenService)
         {
             _tokenService = tokenService;
+            _currentUser = user;
             InitializeComponent();
-            WelcomeLabel.Text = $"Welcome {user.UserName}!";
-            WinsLabel.Text = $"Wins: {user.Wins}";
-            LossesLabel.Text = $"Losses: {user.Losses}";
+            WelcomeLabel.Text = $"Welcome {_currentUser.UserName}!";
+            WinsLabel.Text = $"Wins: {_currentUser.Wins}";
+            LossesLabel.Text = $"Losses: {_currentUser.Losses}";
         }
 
         private async void JoinGameButton_Click(object sender, EventArgs e)
@@ -26,7 +28,7 @@ namespace BattleShipGame_Frontend.Windows
             var button = (Button)sender;
             button.Enabled = false;
             var sessions = await ListSessions(ConnectionClient.sharedClient);
-            SessionsWindow sessionsWindow = new(sessions, _tokenService);
+            SessionsWindow sessionsWindow = new(sessions, _tokenService, _currentUser);
             sessionsWindow.Show();
             this.Close();
 
