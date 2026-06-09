@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Net.Http.Json;
 using BattleShipGame_Frontend.Configuration;
 using BattleShipGame_Frontend.Models;
 using BattleShipGame_Frontend.Services;
@@ -31,7 +32,18 @@ namespace BattleShipGame_Frontend.Windows
             MessageBox.Show(await response.Content.ReadAsStringAsync());
         }
 
-        private void CreateGameButton_Click(object sender, EventArgs e) { }
+        private async void CreateGameButton_Click(object sender, EventArgs e) {
+            var session = await CreateSession(ConnectionClient.sharedClient);
+        }
+        private async Task<Session> CreateSession(HttpClient httpClient)
+        {
+            using HttpResponseMessage response = await httpClient.PostAsync("session", null);
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return await response.Content.ReadFromJsonAsync<Session>();
+            }
+            return null;
+        }
 
         private void LogOutButton_Click(object sender, EventArgs e)
         {
@@ -43,10 +55,13 @@ namespace BattleShipGame_Frontend.Windows
 
         private async void DeleteAccountButton_Click(object sender, EventArgs e)
         {
+            StatusLabel.Text = "Connecting...";
             if (await DeleteAccount(ConnectionClient.sharedClient))
             {
+                StatusLabel.Text = "User deleted successfully";
                 LoginWindow loginWindow = new(_tokenService);
                 ConnectionClient.sharedClient.DefaultRequestHeaders.Authorization = null;
+                await Task.Delay(2000);
                 loginWindow.Show();
                 this.Close();
             }

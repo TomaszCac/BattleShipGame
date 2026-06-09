@@ -35,6 +35,7 @@
             DeleteAccountButton = new Button();
             WinsLabel = new Label();
             LossesLabel = new Label();
+            StatusLabel = new Label();
             SuspendLayout();
             // 
             // WelcomeLabel
@@ -65,6 +66,7 @@
             CreateGameButton.TabIndex = 3;
             CreateGameButton.Text = "Create Game";
             CreateGameButton.UseVisualStyleBackColor = true;
+            CreateGameButton.Click += CreateGameButton_Click;
             // 
             // LogOutButton
             // 
@@ -74,6 +76,7 @@
             LogOutButton.TabIndex = 4;
             LogOutButton.Text = "Log Out";
             LogOutButton.UseVisualStyleBackColor = true;
+            LogOutButton.Click += LogOutButton_Click;
             // 
             // DeleteAccountButton
             // 
@@ -83,6 +86,7 @@
             DeleteAccountButton.TabIndex = 5;
             DeleteAccountButton.Text = "Delete Account";
             DeleteAccountButton.UseVisualStyleBackColor = true;
+            DeleteAccountButton.Click += DeleteAccountButton_Click;
             // 
             // WinsLabel
             // 
@@ -104,11 +108,20 @@
             LossesLabel.TabIndex = 7;
             LossesLabel.Text = "Losses: {Losses}";
             // 
+            // StatusLabel
+            // 
+            StatusLabel.AutoSize = true;
+            StatusLabel.Location = new Point(1149, 356);
+            StatusLabel.Name = "StatusLabel";
+            StatusLabel.Size = new Size(0, 15);
+            StatusLabel.TabIndex = 8;
+            // 
             // MenuWindow
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1360, 795);
+            Controls.Add(StatusLabel);
             Controls.Add(LossesLabel);
             Controls.Add(WinsLabel);
             Controls.Add(DeleteAccountButton);
@@ -131,5 +144,6 @@
         private Button DeleteAccountButton;
         private Label WinsLabel;
         private Label LossesLabel;
+        private Label StatusLabel;
     }
 }
