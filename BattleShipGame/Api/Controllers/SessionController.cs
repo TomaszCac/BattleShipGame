@@ -52,6 +52,14 @@ namespace BattleShipGame.Api.Controllers
             return Ok(_sessionRepos.CreateSession(user));
         }
 
+        [HttpGet("join/{id}"), Authorize]
+        public async Task<IActionResult> JoinSession(int id)
+        {
+            var user = await _userRepos.GetUserByIdAsync(_userService.GetId());
+            var session = _sessionRepos.JoinSession(user, id);
+            return Ok(JsonConvert.SerializeObject(session));
+        }
+
         [HttpDelete]
         public IActionResult DeleteSession(int id)
         {
