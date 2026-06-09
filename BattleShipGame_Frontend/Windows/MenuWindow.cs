@@ -42,6 +42,10 @@ namespace BattleShipGame_Frontend.Windows
 
         private async void CreateGameButton_Click(object sender, EventArgs e) {
             var session = await CreateSession(ConnectionClient.sharedClient);
+            BattleWindow battleWindow = new(session, true, _currentUser, _tokenService);
+            battleWindow.Show();
+            this.Close();
+
         }
         private async Task<Session> CreateSession(HttpClient httpClient)
         {

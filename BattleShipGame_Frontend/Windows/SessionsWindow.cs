@@ -77,8 +77,10 @@ namespace BattleShipGame_Frontend
             );
             var stringContent = await response.Content.ReadAsStringAsync();
             Session session = JsonConvert.DeserializeObject<Session>(stringContent);
-            
-            MessageBox.Show($"{session.Id.ToString()}, {session.Host.UserName}, {session.Guest.UserName}");
+
+            BattleWindow battleWindow = new(session, false, _currentUser, _tokenService);
+            battleWindow.Show();
+            this.Close();
         }
         private async void BackButton_Click(Object sender, EventArgs e)
         {
