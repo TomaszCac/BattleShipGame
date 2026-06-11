@@ -1,5 +1,6 @@
 ﻿using BattleShipGame_Frontend.Models;
 using BattleShipGame_Frontend.Services;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ToolTip;
 
 namespace BattleShipGame_Frontend.Windows
 {
@@ -209,38 +210,62 @@ namespace BattleShipGame_Frontend.Windows
                 string[] stringArray = label.Name.Split(',');
                 int positionX = Convert.ToInt32(stringArray[0]);
                 int positionY = Convert.ToInt32(stringArray[1]);
-                int currentShipSize = shipSizes[currentShipIndex];
-                if(rotation)
+                ModifyTile(positionX, positionY, shipSizes[currentShipIndex], Color.LightBlue, false);
+            }
+        }
+        private void ModifyTile(int x, int y, int currentShipSize, Color color, bool isClicked)
+        {
+            if (rotation)
+            {
+                if (x <= 9 - currentShipSize)
                 {
-                    if(positionX <= 9 - currentShipSize)
+                    if (CheckIfAvailable(x, y, rotation, currentShipSize, true))
                     {
-                        if(CheckIfAvailable(positionX, positionY, rotation, currentShipSize, true))
-                        {
-                            DrawTiles(positionX, positionY, rotation, currentShipSize, true, Color.LightBlue, false);
-                        }
-                    }
-                    else if (positionX >= 0 + currentShipSize)
-                    {
-                        if (CheckIfAvailable(positionX, positionY, rotation, currentShipSize, false)) {
-                            DrawTiles(positionX, positionY, rotation, currentShipSize, false, Color.LightBlue, false);
-                        }
+                        DrawTiles(x, y, rotation, currentShipSize, true, color, isClicked);
+                        NextShip(isClicked);
+
                     }
                 }
-                else
+                else if (x >= 0 + currentShipSize)
                 {
-                    if(positionY <= 9 - currentShipSize)
+                    if (CheckIfAvailable(x, y, rotation, currentShipSize, false))
                     {
-                        if (CheckIfAvailable(positionX, positionY, rotation, currentShipSize, true))
-                        {
-                            DrawTiles(positionX, positionY, rotation, currentShipSize, true, Color.LightBlue, false);
-                        }
-                    }
-                    else if (CheckIfAvailable(positionX, positionY, rotation, currentShipSize, false))
-                    {
-                        DrawTiles(positionX, positionY, rotation, currentShipSize, false, Color.LightBlue, false);
+                        DrawTiles(x, y, rotation, currentShipSize, false, color, isClicked);
+                        NextShip(isClicked);
+
                     }
                 }
             }
+            else
+            {
+                if (y <= 9 - currentShipSize)
+                {
+                    if (CheckIfAvailable(x, y, rotation, currentShipSize, true))
+                    {
+                        DrawTiles(x, y, rotation, currentShipSize, true, color, isClicked);
+                        NextShip(isClicked);
+
+                    }
+                }
+                else if (CheckIfAvailable(x, y, rotation, currentShipSize, false))
+                {
+                    DrawTiles(x, y, rotation, currentShipSize, false, color, isClicked);
+                    NextShip(isClicked);
+                }
+            }
+        }
+        private void NextShip(bool isClicked)
+        {
+            if (isClicked)
+            {
+                currentShipIndex--;
+                ChangeShipPlacementLabel();
+                if (currentShipIndex < 0)
+                {
+                    readyButton.Enabled = true;
+                }
+            }
+
         }
         private void Label_MouseLeave(object sender, EventArgs e)
         {
@@ -250,38 +275,7 @@ namespace BattleShipGame_Frontend.Windows
                 string[] stringArray = label.Name.Split(',');
                 int positionX = Convert.ToInt32(stringArray[0]);
                 int positionY = Convert.ToInt32(stringArray[1]);
-                int currentShipSize = shipSizes[currentShipIndex];
-                if (rotation)
-                {
-                    if (positionX <= 9 - currentShipSize)
-                    {
-                        if (CheckIfAvailable(positionX, positionY, rotation, currentShipSize, true))
-                        {
-                            DrawTiles(positionX, positionY, rotation, currentShipSize, true, Color.White, false);
-                        }
-                    }
-                    else if (positionX >= 0 + currentShipSize)
-                    {
-                        if (CheckIfAvailable(positionX, positionY, rotation, currentShipSize, false))
-                        {
-                            DrawTiles(positionX, positionY, rotation, currentShipSize, false, Color.White, false);
-                        }
-                    }
-                }
-                else
-                {
-                    if (positionY <= 9 - currentShipSize)
-                    {
-                        if (CheckIfAvailable(positionX, positionY, rotation, currentShipSize, true))
-                        {
-                            DrawTiles(positionX, positionY, rotation, currentShipSize, true, Color.White, false);
-                        }
-                    }
-                    else if (CheckIfAvailable(positionX, positionY, rotation, currentShipSize, false))
-                    {
-                        DrawTiles(positionX, positionY, rotation, currentShipSize, false, Color.White, false);
-                    }
-                }
+                ModifyTile(positionX, positionY, shipSizes[currentShipIndex], Color.White, false);
             }
         }
         private void Label_Click(object sender, EventArgs e)
@@ -292,66 +286,7 @@ namespace BattleShipGame_Frontend.Windows
                 string[] stringArray = label.Name.Split(',');
                 int positionX = Convert.ToInt32(stringArray[0]);
                 int positionY = Convert.ToInt32(stringArray[1]);
-                int currentShipSize = shipSizes[currentShipIndex];
-                Color currentShipColor = shipColors[currentShipIndex];
-                if (rotation)
-                {
-                    if (positionX <= 9 - currentShipSize)
-                    {
-                        if (CheckIfAvailable(positionX, positionY, rotation, currentShipSize, true))
-                        {
-                            DrawTiles(positionX, positionY, rotation, currentShipSize, true, currentShipColor, true);
-                            currentShipIndex--;
-                            ChangeShipPlacementLabel();
-                            if (currentShipIndex < 0)
-                            {
-                                readyButton.Enabled = true;
-                            }
-                        }
-                    }
-                    else if (positionX >= 0 + currentShipSize)
-                    {
-                        if (CheckIfAvailable(positionX, positionY, rotation, currentShipSize, false))
-                        {
-                            DrawTiles(positionX, positionY, rotation, currentShipSize, false, currentShipColor, true);
-                            currentShipIndex--;
-                            ChangeShipPlacementLabel();
-                            if (currentShipIndex < 0)
-                            {
-                                readyButton.Enabled = true;
-                            }
-
-                        }
-                    }
-                }
-                else
-                {
-                    if (positionY <= 9 - currentShipSize)
-                    {
-                        if (CheckIfAvailable(positionX, positionY, rotation, currentShipSize, true))
-                        {
-                            DrawTiles(positionX, positionY, rotation, currentShipSize, true, currentShipColor, true);
-                            currentShipIndex--;
-                            ChangeShipPlacementLabel();
-                            if (currentShipIndex < 0)
-                            {
-                                readyButton.Enabled = true;
-                            }
-
-                        }
-                    }
-                    else if (CheckIfAvailable(positionX, positionY, rotation, currentShipSize, false))
-                    {
-                        DrawTiles(positionX, positionY, rotation, currentShipSize, false, currentShipColor, true);
-                        currentShipIndex--;
-                        ChangeShipPlacementLabel();
-                        if (currentShipIndex < 0)
-                        {
-                            readyButton.Enabled = true;
-                        }
-
-                    }
-                }
+                ModifyTile(positionX, positionY, shipSizes[currentShipIndex], shipColors[currentShipIndex], true);
             }
         }
     }
