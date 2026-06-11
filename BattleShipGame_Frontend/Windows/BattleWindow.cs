@@ -1,6 +1,5 @@
 ﻿using BattleShipGame_Frontend.Models;
 using BattleShipGame_Frontend.Services;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.ToolTip;
 
 namespace BattleShipGame_Frontend.Windows
 {
@@ -12,8 +11,10 @@ namespace BattleShipGame_Frontend.Windows
         private Session _session;
         public Button changeRotationButton;
         public Button restartBoardButton;
+        public Button quitButton;
         private Button readyButton;
         private Label statusLabel;
+        private Label idLabel;
         public Label[,] boardVisual = new Label[10, 10];
         public int[,] board = new int[10, 10];
         public char[] alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
@@ -30,11 +31,8 @@ namespace BattleShipGame_Frontend.Windows
             _currentUser = currentUser;
             _session = session;
             InitializeComponent();
-            IdLabel.Text = $"Session ID: {session.Id}";
             SetupBoard();
             ChangeShipPlacementLabel();
-            SetupEnemyBoard();
-
         }
         private void SetupBoard()
         {
@@ -86,22 +84,41 @@ namespace BattleShipGame_Frontend.Windows
             changeRotationButton.Text = "Rotate";
             changeRotationButton.Width = 100;
             changeRotationButton.Height = 50;
+            changeRotationButton.Name = "ChangeRotationButton";
             changeRotationButton.Click += ChangeRotationButton_Click;
             restartBoardButton = new Button();
             restartBoardButton.Location = new Point(625, 100);
             restartBoardButton.Text = "Restart Board";
             restartBoardButton.Width = 100;
             restartBoardButton.Height = 50;
+            restartBoardButton.Name = "RestartBoardButton";
+            restartBoardButton.Click += RestartBoardButton_Click;
             readyButton = new Button();
             readyButton.Text = "Ready";
             readyButton.Enabled = false;
             readyButton.Location = new Point(625, 150);
             readyButton.Width = 100;
             readyButton.Height = 50;
+            readyButton.Name = "ReadyButton";
+            readyButton.Click += ReadyButton_Click;
             statusLabel = new Label();
             statusLabel.Location = new Point(575, 300);
             statusLabel.Width = 200;
             statusLabel.Height = 100;
+            quitButton = new Button();
+            quitButton.Text = "Quit";
+            quitButton.Name = "QuitButton";
+            quitButton.Width = 100;
+            quitButton.Height = 50;
+            quitButton.Location = new Point(12, 735);
+            quitButton.Click += QuitButton_Click;
+            idLabel = new Label();
+            idLabel.Height = 15;
+            idLabel.Name = "IdLabel";
+            idLabel.Text = $"Session ID: {_session.Id}";
+            idLabel.Location = new Point(674, 752);
+            this.Controls.Add(idLabel);
+            this.Controls.Add(quitButton);
             this.Controls.Add(statusLabel);
             this.Controls.Add(readyButton);
             this.Controls.Add(restartBoardButton);
@@ -135,13 +152,14 @@ namespace BattleShipGame_Frontend.Windows
                     }
                     else
                     {
-                        Button btn = new Button();
-                        btn.Name = $"{x-1},{y}";
-                        btn.Text = $"{alphabet[x-1]} {y}";
-                        btn.Width = 50;
-                        btn.Height = 50;
-                        btn.Location = new Point(800 + y * 50 + 50, (x-1) * 50 + 50);
-                        this.Controls.Add(btn);
+                        Button button = new Button();
+                        button.Name = $"{x-1},{y}";
+                        button.Text = $"{alphabet[x-1]} {y}";
+                        button.Width = 50;
+                        button.Height = 50;
+                        button.Location = new Point(800 + y * 50 + 50, (x-1) * 50 + 50);
+                        button.Click += ShootEnemyButton_Click;
+                        this.Controls.Add(button);
                     }
                     
                 }
@@ -150,6 +168,34 @@ namespace BattleShipGame_Frontend.Windows
         private void ChangeRotationButton_Click(object sender, EventArgs e)
         {
             rotation = !rotation;
+        }
+        private void RestartBoardButton_Click(object sender, EventArgs e)
+        {
+            currentShipIndex = 4;
+            rotation = true;
+            this.Controls.Clear();
+            SetupBoard();
+        }
+        private void QuitButton_Click(object sender, EventArgs e)
+        {
+            MenuWindow menuWindow = new MenuWindow(_currentUser, _tokenService);
+            menuWindow.Show();
+            this.Close();
+        }
+        private void ReadyButton_Click(object sender, EventArgs e)
+        {
+            restartBoardButton.Enabled = false;
+            changeRotationButton.Enabled = false;
+            readyButton.Enabled = false;
+            SetupEnemyBoard();
+        }
+        private void ShootEnemyButton_Click(object sender, EventArgs e)
+        {
+            var button = (Button)sender;
+            string[] stringArray = button.Name.Split(',');
+            int coordinateX = Convert.ToInt32(stringArray[0]);
+            int coordinateY = Convert.ToInt32(stringArray[1]);
+            button.Enabled = false;
         }
         public void ChangeShipPlacementLabel()
         {

@@ -28,43 +28,18 @@
         /// </summary>
         private void InitializeComponent()
         {
-            QuitButton = new Button();
-            IdLabel = new Label();
             SuspendLayout();
-            // 
-            // QuitButton
-            // 
-            QuitButton.Location = new Point(12, 735);
-            QuitButton.Name = "QuitButton";
-            QuitButton.Size = new Size(101, 48);
-            QuitButton.TabIndex = 0;
-            QuitButton.Text = "Quit";
-            QuitButton.UseVisualStyleBackColor = true;
-            // 
-            // IdLabel
-            // 
-            IdLabel.AutoSize = true;
-            IdLabel.Location = new Point(674, 752);
-            IdLabel.Name = "IdLabel";
-            IdLabel.Size = new Size(0, 15);
-            IdLabel.TabIndex = 1;
             // 
             // BattleWindow
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1360, 795);
-            Controls.Add(IdLabel);
-            Controls.Add(QuitButton);
             Name = "BattleWindow";
             Text = "BattleWindow";
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
-
-        private Button QuitButton;
-        private Label IdLabel;
     }
 }
