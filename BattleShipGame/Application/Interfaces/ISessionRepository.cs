@@ -9,6 +9,9 @@ namespace BattleShipGame.Application.Interfaces
         public bool RemoveSession(int id);
         public List<Session>? GetAvailableSessions();
         public Session JoinSession(User user, int id);
+        public bool WinGame(int sessionId, bool turn);
+        public bool ShootShip(int x, int y, int sessionId, bool turn);
+        public bool EndSession(int sessionId, bool host);
         public void SetBoard(int[,] board, int sessionId, bool host);
         public bool CheckStart(int sessionId);
     }

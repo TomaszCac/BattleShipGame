@@ -24,7 +24,72 @@ namespace BattleShipGame.Infrastructure.Repositiories
         {
             return _sessions.FindAll(b => b.Guest == null);
         }
-
+        public bool WinGame(int sessionId, bool turn)
+        {
+            var session = _sessions.FirstOrDefault(b => b.Id == sessionId);
+            if (turn)
+            {
+                foreach (int coordinates in session.BoardGuest)
+                {
+                    if (coordinates != 0 && coordinates != -1)
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            else
+            {
+                foreach (int coordinates in session.BoardHost)
+                {
+                    if (coordinates != 0 && coordinates != -1)
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+        public bool ShootShip(int x, int y, int sessionId, bool turn)
+        {
+            var game = _sessions.FirstOrDefault(b => b.Id == sessionId);
+            if (turn)
+            {
+                if (game.BoardGuest[x, y] != 0)
+                {
+                    game.BoardGuest[x, y] = -1;
+                    return true;
+                }
+                return false;
+            }
+            else
+            {
+                if (game.BoardHost[x, y] != 0)
+                {
+                    game.BoardHost[x, y] = -1;
+                    return true;
+                }
+                return false;
+            }
+        }
+        public bool EndSession(int sessionId, bool host)
+        {
+            var session = _sessions.FirstOrDefault(b => b.Id == sessionId);
+            if (host)
+            {
+                if (session.Guest != null)
+                {
+                    session.Host.Losses++;
+                    session.Guest.Wins++;
+                }
+            }
+            else
+            {
+                session.Guest.Losses++;
+                session.Host.Wins++;
+            }
+            return _sessions.Remove(session);
+        }
         public void SetBoard(int[,] board, int sessionId, bool host)
         {
             var session = _sessions.FirstOrDefault(b => b.Id == sessionId);

@@ -63,7 +63,29 @@ namespace BattleShipGame.Api.Controllers
 
             return Ok();
         }
-
+        [HttpPost("shoot")]
+        public async Task<IActionResult> ShootShip(int x, int y, int sessionId, bool turn)
+        {
+            if (_sessionRepos.ShootShip(x, y, sessionId, turn))
+            {
+                if (_sessionRepos.WinGame(sessionId, turn))
+                {
+                    await _sessionHub.WinGame(sessionId, turn);
+                    _sessionRepos.EndSession(sessionId, turn);
+                    return Ok(true);
+                }
+                else
+                {
+                    await _sessionHub.ShipHit(x, y, sessionId, true);
+                    return Ok(true);
+                }
+            }
+            else
+            {
+                await _sessionHub.ShipHit(x, y, sessionId, false); 
+                return Ok(false);
+            }
+        }
         [HttpPost, Authorize]
         public async Task<IActionResult> CreateSession()
         {
