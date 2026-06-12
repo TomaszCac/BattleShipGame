@@ -1,6 +1,9 @@
-﻿using BattleShipGame_Frontend.Models;
+﻿using BattleShipGame_Frontend.Configuration;
+using BattleShipGame_Frontend.Models;
 using BattleShipGame_Frontend.Services;
 using Microsoft.AspNetCore.SignalR.Client;
+using Newtonsoft.Json;
+using System.Net.Http.Json;
 namespace BattleShipGame_Frontend.Windows
 {
     public partial class BattleWindow : Form
@@ -42,6 +45,7 @@ namespace BattleShipGame_Frontend.Windows
             _hubConnection = new HubConnectionBuilder().WithUrl("http://localhost:5000/hubs/session").Build();
             _hubConnection.Closed += HubConnection_Closed;
             _hubConnection.On<string>("PlayerConnected",(note) => { statusLabel.Invoke(PlayerConnected, note); } );
+            _hubConnection.On("StartFight", () => { statusLabel.Invoke(StartFight); });
 
         }
         public async void StartConnection()
@@ -234,6 +238,25 @@ namespace BattleShipGame_Frontend.Windows
             restartBoardButton.Enabled = false;
             changeRotationButton.Enabled = false;
             readyButton.Enabled = false;
+            SendBoard(ConnectionClient.sharedClient);
+        }
+        private async void SendBoard(HttpClient httpClient)
+        {
+            var boardJson = JsonConvert.SerializeObject(board);
+            using HttpResponseMessage response = await httpClient.PostAsJsonAsync($"session/place?sessionId={_session.Id}&host={_isHost}", boardJson);
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                statusLabel.Text = "Your board is ready! Waiting for opponent";
+            }
+            else
+            {
+                statusLabel.Text = "Failure";
+            }
+        }
+        private async void StartFight()
+        {
+            statusLabel.Text = "Both players are ready!";
+            await Task.Delay(2000);
             SetupEnemyBoard();
         }
         private void ShootEnemyButton_Click(object sender, EventArgs e)
