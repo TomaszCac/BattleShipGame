@@ -4,6 +4,7 @@ using BattleShipGame_Frontend.Services;
 using Microsoft.AspNetCore.SignalR.Client;
 using Newtonsoft.Json;
 using System.Net.Http.Json;
+using static System.Collections.Specialized.BitVector32;
 namespace BattleShipGame_Frontend.Windows
 {
     public partial class BattleWindow : Form
@@ -11,7 +12,9 @@ namespace BattleShipGame_Frontend.Windows
         private HubConnection _hubConnection;
         private readonly TokenService _tokenService;
         private readonly bool _isHost;
+        private bool _turn;
         private User _currentUser;
+        private bool _gameRunning = true;
         private Session _session;
         public Button changeRotationButton;
         public Button restartBoardButton;
@@ -34,6 +37,7 @@ namespace BattleShipGame_Frontend.Windows
             _isHost = isHost;
             _currentUser = currentUser;
             _session = session;
+            _turn = _isHost;
             InitializeComponent();
             EstablishConnection();
             StartConnection();
@@ -46,6 +50,8 @@ namespace BattleShipGame_Frontend.Windows
             _hubConnection.Closed += HubConnection_Closed;
             _hubConnection.On<string>("PlayerConnected",(note) => { statusLabel.Invoke(PlayerConnected, note); } );
             _hubConnection.On("StartFight", () => { statusLabel.Invoke(StartFight); });
+            _hubConnection.On<int, int, bool>("ShipHit", (x, y, isHit) => { this.Invoke(ShipHit, x, y, isHit); });
+            _hubConnection.On<bool>("WinGame", (turn) => { this.Invoke(WinGame, turn); });
 
         }
         public async void StartConnection()
@@ -259,13 +265,88 @@ namespace BattleShipGame_Frontend.Windows
             await Task.Delay(2000);
             SetupEnemyBoard();
         }
-        private void ShootEnemyButton_Click(object sender, EventArgs e)
+        private async void ShootEnemyButton_Click(object sender, EventArgs e)
         {
             var button = (Button)sender;
             string[] stringArray = button.Name.Split(',');
             int coordinateX = Convert.ToInt32(stringArray[0]);
             int coordinateY = Convert.ToInt32(stringArray[1]);
-            button.Enabled = false;
+            if (_turn)
+            {
+                var isHit = await ShootEnemy(ConnectionClient.sharedClient, coordinateX, coordinateY);
+                if (isHit)
+                {
+                    button.BackColor = Color.Blue;
+                }
+                else
+                {
+                    button.BackColor = Color.Black;
+                }
+                button.ForeColor = Color.White;
+
+                button.Enabled = false;
+            }
+        }
+        private async Task<bool> ShootEnemy(HttpClient httpClient, int x, int y)
+        {
+            var response = await httpClient.PostAsync(
+                    $"session/shoot?x={x}&y={y}&sessionId={_session.Id}&turn={_isHost}",
+                    null
+                );
+            return await response.Content.ReadFromJsonAsync<bool>();
+        }
+        private void ShipHit(int x, int y, bool isHit)
+        {
+           if (_turn)
+            {
+                if(isHit)
+                {
+                    statusLabel.Text = "Ship has been hit!";
+                }
+                else
+                {
+                    statusLabel.Text = "You missed!";
+                }
+            } else
+            {
+                if (isHit)
+                {
+                    statusLabel.Text = "Your ship has been hit!";
+                }
+                else
+                {
+                    statusLabel.Text = "Enemy missed!";
+                }
+                boardVisual[x, y].BackColor = Color.Black;
+                board[x, y] = -1;
+            }
+            CycleTurn();
+
+        }
+        private void CycleTurn()
+        {
+            _turn = !_turn;
+        }
+        private void WinGame(bool hostWon)
+        {
+            this.Controls.Clear();
+            statusLabel = new Label();
+            statusLabel.Location = new Point(550, 200);
+            statusLabel.Width = 300;
+            statusLabel.Height = 100;
+
+            if (hostWon == _isHost)
+            {
+                statusLabel.Text = "You Won!";
+                _currentUser.Wins++;
+            }
+            else
+            {
+                statusLabel.Text = "You Lost!";
+                _currentUser.Losses--;
+            }
+            _gameRunning = false;
+            this.Controls.Add(statusLabel);
         }
         public void ChangeShipPlacementLabel()
         {
