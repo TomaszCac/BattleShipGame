@@ -25,6 +25,32 @@ namespace BattleShipGame.Infrastructure.Repositiories
             return _sessions.FindAll(b => b.Guest == null);
         }
 
+        public void SetBoard(int[,] board, int sessionId, bool host)
+        {
+            var session = _sessions.FirstOrDefault(b => b.Id == sessionId);
+            if (host)
+            {
+                session.BoardHost = board;
+            }
+            else
+            {
+                session.BoardGuest = board;
+            }
+        }
+
+        public bool CheckStart(int sessionId)
+        {
+            var session = _sessions.FirstOrDefault(b => b.Id == sessionId);
+            if (session.BoardHost != null)
+            {
+                if (session.BoardGuest != null)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public Session? GetSession(int id)
         {
             return _sessions.FirstOrDefault(b => b.Id == id);

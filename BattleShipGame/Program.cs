@@ -1,4 +1,4 @@
-using System.Text;
+using BattleShipGame.Api.Hubs;
 using BattleShipGame.Application.Dtos;
 using BattleShipGame.Application.Interfaces;
 using BattleShipGame.Application.Mapping;
@@ -7,10 +7,12 @@ using BattleShipGame.Domain.Entities;
 using BattleShipGame.Infrastructure.Auth;
 using BattleShipGame.Infrastructure.Persistence;
 using BattleShipGame.Infrastructure.Repositiories;
+using BattleShipGame.Infrastructure.SignalR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace BattleShipGame
 {
@@ -22,10 +24,12 @@ namespace BattleShipGame
 
             builder.Services.AddControllers();
             builder.Services.AddOpenApi();
+            builder.Services.AddSignalR();
             builder.Services.AddSingleton<ISessionRepository, SessionRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+            builder.Services.AddScoped<IGameNotificationService, SignalRGameNotificationService>();
             builder
                 .Services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<UserDbContext>();
@@ -61,6 +65,7 @@ namespace BattleShipGame
                 });
 
             var app = builder.Build();
+            app.MapHub<BattleShipHub>("/hubs/session");
 
             if (app.Environment.IsDevelopment())
             {
