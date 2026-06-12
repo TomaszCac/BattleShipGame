@@ -1,10 +1,11 @@
 ﻿using BattleShipGame_Frontend.Models;
 using BattleShipGame_Frontend.Services;
-
+using Microsoft.AspNetCore.SignalR.Client;
 namespace BattleShipGame_Frontend.Windows
 {
     public partial class BattleWindow : Form
     {
+        private HubConnection _hubConnection;
         private readonly TokenService _tokenService;
         private readonly bool _isHost;
         private User _currentUser;
@@ -31,8 +32,54 @@ namespace BattleShipGame_Frontend.Windows
             _currentUser = currentUser;
             _session = session;
             InitializeComponent();
+            EstablishConnection();
+            StartConnection();
+            ShowInitialMessage();
+            
+        }
+        private void EstablishConnection()
+        {
+            _hubConnection = new HubConnectionBuilder().WithUrl("http://localhost:5000/hubs/session").Build();
+            _hubConnection.Closed += HubConnection_Closed;
+            _hubConnection.On<string>("PlayerConnected",(note) => { statusLabel.Invoke(PlayerConnected, note); } );
+
+        }
+        public async void StartConnection()
+        {
+            await _hubConnection.StartAsync();
+            if (!_isHost)
+                await _hubConnection.InvokeAsync(
+                    "PlayerConnected",
+                    _session.Id.ToString(),
+                    _currentUser.UserName
+                );
+            else
+                await _hubConnection.InvokeAsync("HostGame", _session.Id.ToString());
+        }
+        private async Task HubConnection_Closed(Exception? arg)
+        {
+            await Task.Delay(new Random().Next(0, 5) * 100);
+            await _hubConnection.StartAsync();
+        }
+        private async Task PlayerConnected(string note) {
+            statusLabel.Text = note;
+            await Task.Delay(2000);
+            this.Controls.Clear();
             SetupBoard();
-            ChangeShipPlacementLabel();
+        }
+        private void ShowInitialMessage()
+        {
+            statusLabel = new Label();
+            statusLabel.Location = new Point(550, 200);
+            statusLabel.Width = 300;
+            statusLabel.Height = 100;
+            statusLabel.Text = "Waiting for opponent";
+            this.Controls.Add(statusLabel);
+            idLabel = new Label();
+            idLabel.Height = 15;
+            idLabel.Name = "IdLabel";
+            idLabel.Text = $"Session ID: {_session.Id}";
+            idLabel.Location = new Point(674, 752);
         }
         private void SetupBoard()
         {
