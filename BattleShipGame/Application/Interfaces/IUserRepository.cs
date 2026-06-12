@@ -10,6 +10,7 @@ namespace BattleShipGame.Application.Interfaces
         public Task<User?> GetUserByIdAsync(string id);
         public Task<User?> GetUserByUserNameAsync(string userName);
         public Task<Result<IdentityError[]>> UpdateUserAsync(User user);
+        public Task AddWinOrLose(string hostId, string guestId, bool hostWon);
         public Task<bool> DeleteUserAsync(string id);
     }
 }

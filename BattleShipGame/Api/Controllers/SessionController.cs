@@ -71,6 +71,8 @@ namespace BattleShipGame.Api.Controllers
                 if (_sessionRepos.WinGame(sessionId, turn))
                 {
                     await _sessionHub.WinGame(sessionId, turn);
+                    var usersIds = _sessionRepos.GetUserIdsFromSession(sessionId);
+                    await _userRepos.AddWinOrLose(usersIds.Item1, usersIds.Item2, turn);
                     _sessionRepos.EndSession(sessionId, turn);
                     return Ok(true);
                 }

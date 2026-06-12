@@ -17,6 +17,23 @@ namespace BattleShipGame.Infrastructure.Repositiories
             _userManager = userManager;
         }
 
+        public async Task AddWinOrLose(string hostId, string guestId, bool hostWon)
+        {
+            var host = await _userManager.FindByIdAsync(hostId);
+            var guest = await _userManager.FindByIdAsync(guestId);
+            if (hostWon)
+            {
+                host.Wins++;
+                guest.Losses++;
+            } else
+            {
+                host.Losses++;
+                guest.Wins++;
+            }
+            await _userManager.UpdateAsync(host);
+            await _userManager.UpdateAsync(guest);
+        }
+
         public async Task<Result<IdentityError[]>> CreateUserAsync(User user, string password)
         {
             var dbResult = await _userManager.CreateAsync(user, password);

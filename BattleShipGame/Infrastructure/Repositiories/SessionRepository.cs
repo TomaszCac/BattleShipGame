@@ -136,5 +136,12 @@ namespace BattleShipGame.Infrastructure.Repositiories
             else
                 return false;
         }
+
+        public (string, string) GetUserIdsFromSession(int sessionId)
+        {
+            var session = _sessions.FirstOrDefault(b => b.Id == sessionId);
+            return (session.Host.Id, session.Guest.Id);
+
+        }
     }
 }
