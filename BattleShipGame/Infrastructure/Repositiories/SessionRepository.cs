@@ -72,22 +72,9 @@ namespace BattleShipGame.Infrastructure.Repositiories
                 return false;
             }
         }
-        public bool EndSession(int sessionId, bool host)
+        public bool EndSession(int sessionId)
         {
             var session = _sessions.FirstOrDefault(b => b.Id == sessionId);
-            if (host)
-            {
-                if (session.Guest != null)
-                {
-                    session.Host.Losses++;
-                    session.Guest.Wins++;
-                }
-            }
-            else
-            {
-                session.Guest.Losses++;
-                session.Host.Wins++;
-            }
             return _sessions.Remove(session);
         }
         public void SetBoard(int[,] board, int sessionId, bool host)
@@ -137,10 +124,10 @@ namespace BattleShipGame.Infrastructure.Repositiories
                 return false;
         }
 
-        public (string, string) GetUserIdsFromSession(int sessionId)
+        public (string, string?) GetUserIdsFromSession(int sessionId)
         {
             var session = _sessions.FirstOrDefault(b => b.Id == sessionId);
-            return (session.Host.Id, session.Guest.Id);
+            return (session.Host.Id, session.Guest != null ? session.Guest.Id : null);
 
         }
     }

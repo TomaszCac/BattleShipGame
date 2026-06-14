@@ -73,7 +73,7 @@ namespace BattleShipGame.Api.Controllers
                     await _sessionHub.WinGame(sessionId, turn);
                     var usersIds = _sessionRepos.GetUserIdsFromSession(sessionId);
                     await _userRepos.AddWinOrLose(usersIds.Item1, usersIds.Item2, turn);
-                    _sessionRepos.EndSession(sessionId, turn);
+                    _sessionRepos.EndSession(sessionId);
                     return Ok(true);
                 }
                 else
@@ -87,6 +87,17 @@ namespace BattleShipGame.Api.Controllers
                 await _sessionHub.ShipHit(x, y, sessionId, false); 
                 return Ok(false);
             }
+        }
+        [HttpDelete("end")]
+        public async Task<IActionResult> EndGame(int sessionId, bool host)
+        {
+            var usersIds = _sessionRepos.GetUserIdsFromSession(sessionId);
+            if (usersIds.Item2 != null)
+            {
+                await _userRepos.AddWinOrLose(usersIds.Item1, usersIds.Item2, !host);
+            }
+            _sessionRepos.EndSession(sessionId);
+            return NoContent();
         }
         [HttpPost, Authorize]
         public async Task<IActionResult> CreateSession()

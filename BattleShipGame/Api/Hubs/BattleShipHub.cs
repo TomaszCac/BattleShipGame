@@ -13,6 +13,10 @@ namespace BattleShipGame.Api.Hubs
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
         }
+        public async Task Disconnected(string groupName, string userName)
+        {
+            await Clients.Group(groupName).SendAsync("PlayerDisconnected", $"{userName} has disconnected from the game");
+        }
 
     }
 }
