@@ -45,6 +45,9 @@ namespace BattleShipGame_Frontend.Windows
             ShowInitialMessage();
             
         }
+        /// <summary>
+        /// Establishes all needed handlers
+        /// </summary>
         private void EstablishConnection()
         {
             _hubConnection = new HubConnectionBuilder().WithUrl("http://localhost:5000/hubs/session").Build();
@@ -72,6 +75,9 @@ namespace BattleShipGame_Frontend.Windows
             });
             
         }
+        /// <summary>
+        /// Starts hub connection
+        /// </summary>
         public async void StartConnection()
         {
             await _hubConnection.StartAsync();
@@ -99,6 +105,9 @@ namespace BattleShipGame_Frontend.Windows
                 SetupBoard();
             }
         }
+        /// <summary>
+        /// Sets initial message to display
+        /// </summary>
         private void ShowInitialMessage()
         {
             statusLabel = new Label();
@@ -122,6 +131,9 @@ namespace BattleShipGame_Frontend.Windows
             this.Controls.Add(quitButton);
 
         }
+        /// <summary>
+        /// Organizes and displays tiles for user
+        /// </summary>
         private void SetupBoard()
         {
             for (int x = 0; x < 11; x++)
@@ -212,6 +224,9 @@ namespace BattleShipGame_Frontend.Windows
             this.Controls.Add(restartBoardButton);
             this.Controls.Add(changeRotationButton);
         }
+        /// <summary>
+        /// Organizes and displays enemy board buttons
+        /// </summary>
         public void SetupEnemyBoard()
         {
             for (int x = 0; x < 11; x++)
@@ -273,6 +288,11 @@ namespace BattleShipGame_Frontend.Windows
             menuWindow.Show();
             this.Close();
         }
+        /// <summary>
+        /// Stops connection to hub and deletes current session
+        /// </summary>
+        /// <param name="httpClient">HttpClient for connection</param>
+        /// <returns></returns>
         private async Task QuitBattle(HttpClient httpClient)
         {
             if (_gameRunning)
@@ -299,6 +319,10 @@ namespace BattleShipGame_Frontend.Windows
             readyButton.Enabled = false;
             SendBoard(ConnectionClient.sharedClient);
         }
+        /// <summary>
+        /// Sends current set board to server
+        /// </summary>
+        /// <param name="httpClient">HttpClient for connection</param>
         private async void SendBoard(HttpClient httpClient)
         {
             var boardJson = JsonConvert.SerializeObject(board);
@@ -312,6 +336,9 @@ namespace BattleShipGame_Frontend.Windows
                 statusLabel.Text = "Failure";
             }
         }
+        /// <summary>
+        /// Displays message about both users ready and starts display of enemy board
+        /// </summary>
         private async void StartFight()
         {
             statusLabel.Text = "Both players are ready!";
@@ -340,6 +367,13 @@ namespace BattleShipGame_Frontend.Windows
                 button.Enabled = false;
             }
         }
+        /// <summary>
+        /// Sends to server coordinates of selected tile to shoot
+        /// </summary>
+        /// <param name="httpClient">HttpClient for connection</param>
+        /// <param name="x">Coordinate x in (x,y) board</param>
+        /// <param name="y">Coordinate y in (x,y) board</param>
+        /// <returns>Bool value if ship has been hit</returns>
         private async Task<bool> ShootEnemy(HttpClient httpClient, int x, int y)
         {
             var response = await httpClient.PostAsync(
@@ -348,6 +382,12 @@ namespace BattleShipGame_Frontend.Windows
                 );
             return await response.Content.ReadFromJsonAsync<bool>();
         }
+        /// <summary>
+        /// Displays message if ship has been hit
+        /// </summary>
+        /// <param name="x">Coordinate x in (x,y) board</param>
+        /// <param name="y">Coordinate y in (x,y) board</param>
+        /// <param name="isHit">Bool value if ship has been hit</param>
         private void ShipHit(int x, int y, bool isHit)
         {
            if (_turn)
@@ -376,10 +416,17 @@ namespace BattleShipGame_Frontend.Windows
             CycleTurn();
 
         }
+        /// <summary>
+        /// Cycles turn between host and guest
+        /// </summary>
         private void CycleTurn()
         {
             _turn = !_turn;
         }
+        /// <summary>
+        /// Displays message and increments local value win/lose of user
+        /// </summary>
+        /// <param name="hostWon">Bool value if user won</param>
         private void WinGame(bool hostWon)
         {
             this.Controls.Clear();
@@ -401,6 +448,9 @@ namespace BattleShipGame_Frontend.Windows
             _gameRunning = false;
             this.Controls.Add(statusLabel);
         }
+        /// <summary>
+        /// Displays message about current ship to place
+        /// </summary>
         public void ChangeShipPlacementLabel()
         {
             if (currentShipIndex >= 0)
@@ -411,6 +461,15 @@ namespace BattleShipGame_Frontend.Windows
                 statusLabel.Text = "Done! Now click Ready button or Reset your board! \n" +
                     "if you click Ready you can't make any changes then!";
         }
+        /// <summary>
+        /// Checks if on current row/column ship can be placed
+        /// </summary>
+        /// <param name="x">Initial coordinate x in (x,y) board</param>
+        /// <param name="y">Initial coordinate y in (x,y) board</param>
+        /// <param name="rotation">Bool value true for column and false for row</param>
+        /// <param name="currentShip">Int value of ship size</param>
+        /// <param name="direction">Bool value true for decreasing coordinate false for increasing coordinate</param>
+        /// <returns>Bool value if ship can be placed</returns>
         public bool CheckIfAvailable(int x, int y, bool rotation, int currentShip, bool direction)
         {
             for(int length = 0; length < currentShip; length++)
@@ -432,6 +491,16 @@ namespace BattleShipGame_Frontend.Windows
             }
             return true;
         }
+        /// <summary>
+        /// Displays color of tiles
+        /// </summary>
+        /// <param name="x">Initial coordinate x in (x,y) board</param>
+        /// <param name="y">Initial coordinate y in (x,y) board</param>
+        /// <param name="rotation">Bool value true for column and false for row</param>
+        /// <param name="currentship">Int value of ship size</param>
+        /// <param name="direction">Bool value true for decreasing coordinate false for increasing coordinate</param>
+        /// <param name="color">Color in which tiles will be drawn</param>
+        /// <param name="isClicked">Bool value if tile has been clicked</param>
         public void DrawTiles(int x, int y, bool rotation, int currentship, bool direction, Color color, bool isClicked)
         {
             for(int length = 0; length < currentship; length++)
@@ -463,6 +532,14 @@ namespace BattleShipGame_Frontend.Windows
                 ModifyTile(positionX, positionY, shipSizes[currentShipIndex], Color.LightBlue, false);
             }
         }
+        /// <summary>
+        /// Modifies tile
+        /// </summary>
+        /// <param name="x">Initial coordinate x in (x,y) board</param>
+        /// <param name="y">Initial coordinate y in (x,y) board</param>
+        /// <param name="currentShipSize">Int value of ship size</param>
+        /// <param name="color">Color in which tiles will be drawn</param>
+        /// <param name="isClicked">Bool value if tile has been clicked</param>
         private void ModifyTile(int x, int y, int currentShipSize, Color color, bool isClicked)
         {
             if (rotation)
@@ -504,6 +581,10 @@ namespace BattleShipGame_Frontend.Windows
                 }
             }
         }
+        /// <summary>
+        /// Changes current ship size
+        /// </summary>
+        /// <param name="isClicked">Bool value if tile has been clicked</param>
         private void NextShip(bool isClicked)
         {
             if (isClicked)

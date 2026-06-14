@@ -4,6 +4,9 @@ using System.Text;
 
 namespace BattleShipGame_Frontend.Models
 {
+    /// <summary>
+    /// Class for establishing HttpStatus results
+    /// </summary>
     internal class Result
     {
         public string Code { get; set; }

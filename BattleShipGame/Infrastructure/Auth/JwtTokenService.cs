@@ -16,6 +16,11 @@ namespace BattleShipGame.Infrastructure.Auth
             _jwtKey = configuration.GetSection("Token:Key").Value;
         }
 
+        /// <summary>
+        /// Generates token based on current user
+        /// </summary>
+        /// <param name="user">User to generate token for him</param>
+        /// <returns>String value as JWT token</returns>
         public string GenerateToken(User user)
         {
             var claims = new[]

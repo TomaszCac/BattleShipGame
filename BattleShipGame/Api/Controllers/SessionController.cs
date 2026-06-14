@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
+using System.Net;
 
 namespace BattleShipGame.Api.Controllers
 {
@@ -33,6 +34,7 @@ namespace BattleShipGame.Api.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetAllSessions()
         {
             return Ok(
@@ -43,11 +45,13 @@ namespace BattleShipGame.Api.Controllers
         }
 
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetSession(int id)
         {
             return Ok(_sessionRepos.GetSession(id));
         }
         [HttpPost("place")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> PlaceBoard(
             [FromBody] string board,
             int sessionId,
@@ -64,6 +68,7 @@ namespace BattleShipGame.Api.Controllers
             return Ok();
         }
         [HttpPost("shoot")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> ShootShip(int x, int y, int sessionId, bool turn)
         {
             if (_sessionRepos.ShootShip(x, y, sessionId, turn))
@@ -89,6 +94,7 @@ namespace BattleShipGame.Api.Controllers
             }
         }
         [HttpDelete("end")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> EndGame(int sessionId, bool host)
         {
             var usersIds = _sessionRepos.GetUserIdsFromSession(sessionId);
@@ -100,6 +106,7 @@ namespace BattleShipGame.Api.Controllers
             return NoContent();
         }
         [HttpPost, Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> CreateSession()
         {
             var user = await _userRepos.GetUserByIdAsync(_userService.GetId());
@@ -107,6 +114,7 @@ namespace BattleShipGame.Api.Controllers
         }
 
         [HttpGet("join/{id}"), Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> JoinSession(int id)
         {
             var user = await _userRepos.GetUserByIdAsync(_userService.GetId());
@@ -115,6 +123,7 @@ namespace BattleShipGame.Api.Controllers
         }
 
         [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult DeleteSession(int id)
         {
             return Ok(_sessionRepos.RemoveSession(id));

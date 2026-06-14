@@ -48,6 +48,11 @@ namespace BattleShipGame_Frontend
             }
         }
 
+        /// <summary>
+        /// Sends login credentials to server and returns JWT token or null
+        /// </summary>
+        /// <param name="httpClient">HttpClient for connection</param>
+        /// <returns>JWT token as string or null if wrong credentials</returns>
         private async Task<string?> LoginAsync(HttpClient httpClient)
         {
             var user = new Models.User()
@@ -83,6 +88,10 @@ namespace BattleShipGame_Frontend
             }
         }
 
+        /// <summary>
+        /// Sends register credentials to server
+        /// </summary>
+        /// <param name="httpClient">HttpClient for connection</param>
         private async void RegisterUser(HttpClient httpClient)
         {
             var user = new Models.User()
@@ -126,6 +135,11 @@ namespace BattleShipGame_Frontend
             }
         }
 
+        /// <summary>
+        /// Returns user class from server based on current token set
+        /// </summary>
+        /// <param name="httpClient">HttpClient for connection</param>
+        /// <returns>User class from response</returns>
         private async Task<Models.User> GetUser(HttpClient httpClient)
         {
             using HttpResponseMessage response = await httpClient.GetAsync("user/current");

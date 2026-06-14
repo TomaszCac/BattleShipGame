@@ -27,6 +27,9 @@ namespace BattleShipGame_Frontend
             _currentUser = currentUser;
             InsertSessions();
         }
+        /// <summary>
+        /// Display sessions in list
+        /// </summary>
         private void InsertSessions()
         {
             if (_sessions.Count != 0)

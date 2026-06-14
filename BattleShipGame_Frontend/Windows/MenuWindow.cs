@@ -36,6 +36,11 @@ namespace BattleShipGame_Frontend.Windows
 
         }
 
+        /// <summary>
+        /// Returns current available sessions from server
+        /// </summary>
+        /// <param name="httpClient">HttpClient for connection</param>
+        /// <returns>List of session classes</returns>
         private async Task<List<Session>> ListSessions(HttpClient httpClient)
         {
             using HttpResponseMessage response = await httpClient.GetAsync("session");
@@ -52,6 +57,11 @@ namespace BattleShipGame_Frontend.Windows
             this.Close();
 
         }
+        /// <summary>
+        /// Sends session creation request to server and returns session or null
+        /// </summary>
+        /// <param name="httpClient">HttpClient for connection</param>
+        /// <returns>Session class or null if something went wrong on server</returns>
         private async Task<Session> CreateSession(HttpClient httpClient)
         {
             using HttpResponseMessage response = await httpClient.PostAsync("session", null);
@@ -92,6 +102,11 @@ namespace BattleShipGame_Frontend.Windows
             }
         }
 
+        /// <summary>
+        /// Sends account deletion request
+        /// </summary>
+        /// <param name="httpClient">HttpClient for connection</param>
+        /// <returns></returns>
         private async Task<bool> DeleteAccount(HttpClient httpClient)
         {
             using HttpResponseMessage response = await httpClient.DeleteAsync("user");
