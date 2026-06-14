@@ -131,6 +131,7 @@
             Controls.Add(WelcomeLabel);
             Name = "MenuWindow";
             Text = "MenuWindow";
+            FormClosed += MenuWindow_FormClosed;
             ResumeLayout(false);
             PerformLayout();
         }

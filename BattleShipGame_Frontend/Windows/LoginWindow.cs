@@ -41,6 +41,7 @@ namespace BattleShipGame_Frontend
 
                 await Task.Delay(2000);
                 MenuWindow menuWindow = new(user, _tokenService);
+                menuWindow.StartPosition = FormStartPosition.Manual;
                 menuWindow.Location = new Point(this.Location.X, this.Location.Y);
                 menuWindow.Show();
                 this.Close();
@@ -132,5 +133,11 @@ namespace BattleShipGame_Frontend
         }
 
         private void ForgotLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) { }
+
+        private void LoginWindow_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            ApplicationLifeTimeService.ShutdownApplication();
+
+        }
     }
 }

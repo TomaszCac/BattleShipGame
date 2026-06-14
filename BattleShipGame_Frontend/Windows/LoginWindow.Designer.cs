@@ -120,7 +120,7 @@
             StatusLabel.Size = new Size(0, 21);
             StatusLabel.TabIndex = 12;
             // 
-            // MainMenuWindow
+            // LoginWindow
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -134,8 +134,9 @@
             Controls.Add(UsernameLabel);
             Controls.Add(title);
             Controls.Add(LoginButton);
-            Name = "MainMenuWindow";
+            Name = "LoginWindow";
             Text = "Login Menu";
+            FormClosed += LoginWindow_FormClosed;
             ResumeLayout(false);
             PerformLayout();
         }

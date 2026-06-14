@@ -29,6 +29,8 @@ namespace BattleShipGame_Frontend.Windows
             button.Enabled = false;
             var sessions = await ListSessions(ConnectionClient.sharedClient);
             SessionsWindow sessionsWindow = new(sessions, _tokenService, _currentUser);
+            sessionsWindow.StartPosition = FormStartPosition.Manual;
+            sessionsWindow.Location = new Point(this.Location.X, this.Location.Y);
             sessionsWindow.Show();
             this.Close();
 
@@ -40,9 +42,12 @@ namespace BattleShipGame_Frontend.Windows
             return JsonConvert.DeserializeObject<List<Session>>(await response.Content.ReadAsStringAsync());
         }
 
-        private async void CreateGameButton_Click(object sender, EventArgs e) {
+        private async void CreateGameButton_Click(object sender, EventArgs e)
+        {
             var session = await CreateSession(ConnectionClient.sharedClient);
             BattleWindow battleWindow = new(session, true, _currentUser, _tokenService);
+            battleWindow.StartPosition = FormStartPosition.Manual;
+            battleWindow.Location = new Point(this.Location.X, this.Location.Y);
             battleWindow.Show();
             this.Close();
 
@@ -61,21 +66,29 @@ namespace BattleShipGame_Frontend.Windows
         {
             LoginWindow loginWindow = new(_tokenService);
             ConnectionClient.sharedClient.DefaultRequestHeaders.Authorization = null;
+            loginWindow.StartPosition = FormStartPosition.Manual;
+            loginWindow.Location = new Point(this.Location.X, this.Location.Y);
             loginWindow.Show();
             this.Close();
         }
 
         private async void DeleteAccountButton_Click(object sender, EventArgs e)
         {
-            StatusLabel.Text = "Connecting...";
-            if (await DeleteAccount(ConnectionClient.sharedClient))
+            DialogResult selectBox = MessageBox.Show("Are you sure you want to delete your account?","Warning", MessageBoxButtons.YesNo,MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
+            if (DialogResult.Yes == selectBox)
             {
-                StatusLabel.Text = "User deleted successfully";
-                LoginWindow loginWindow = new(_tokenService);
-                ConnectionClient.sharedClient.DefaultRequestHeaders.Authorization = null;
-                await Task.Delay(2000);
-                loginWindow.Show();
-                this.Close();
+                if (await DeleteAccount(ConnectionClient.sharedClient))
+                {
+                    StatusLabel.Text = "Connecting...";
+                    StatusLabel.Text = "User deleted successfully";
+                    LoginWindow loginWindow = new(_tokenService);
+                    ConnectionClient.sharedClient.DefaultRequestHeaders.Authorization = null;
+                    await Task.Delay(2000);
+                    loginWindow.StartPosition = FormStartPosition.Manual;
+                    loginWindow.Location = new Point(this.Location.X, this.Location.Y);
+                    loginWindow.Show();
+                    this.Close();
+                }
             }
         }
 
@@ -87,6 +100,12 @@ namespace BattleShipGame_Frontend.Windows
                 return true;
             }
             return false;
+        }
+
+        private void MenuWindow_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            ApplicationLifeTimeService.ShutdownApplication();
+
         }
     }
 }

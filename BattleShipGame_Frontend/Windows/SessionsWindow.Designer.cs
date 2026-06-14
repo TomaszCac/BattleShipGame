@@ -60,7 +60,7 @@
             RefreshButton.TabIndex = 3;
             RefreshButton.Text = "Refresh";
             RefreshButton.UseVisualStyleBackColor = true;
-            RefreshButton.Click += this.RefreshButton_Click;
+            RefreshButton.Click += RefreshButton_Click;
             // 
             // StatusLabel
             // 
@@ -82,6 +82,7 @@
             Controls.Add(SessionsLayout);
             Name = "SessionsWindow";
             Text = "SessionsWindow";
+            FormClosed += SessionsWindow_FormClosed;
             ResumeLayout(false);
             PerformLayout();
         }

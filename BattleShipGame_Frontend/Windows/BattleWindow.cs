@@ -268,6 +268,8 @@ namespace BattleShipGame_Frontend.Windows
         {
             await QuitBattle(ConnectionClient.sharedClient);
             MenuWindow menuWindow = new MenuWindow(_currentUser, _tokenService);
+            menuWindow.StartPosition = FormStartPosition.Manual;
+            menuWindow.Location = new Point(this.Location.X, this.Location.Y);
             menuWindow.Show();
             this.Close();
         }
@@ -543,6 +545,7 @@ namespace BattleShipGame_Frontend.Windows
             {
                 await QuitBattle(ConnectionClient.sharedClient);
             }
+            ApplicationLifeTimeService.ShutdownApplication();
         }
     }
 }

@@ -79,12 +79,16 @@ namespace BattleShipGame_Frontend
             Session session = JsonConvert.DeserializeObject<Session>(stringContent);
 
             BattleWindow battleWindow = new(session, false, _currentUser, _tokenService);
+            battleWindow.StartPosition = FormStartPosition.Manual;
+            battleWindow.Location = new Point(this.Location.X, this.Location.Y);
             battleWindow.Show();
             this.Close();
         }
         private async void BackButton_Click(Object sender, EventArgs e)
         {
             MenuWindow menuWindow = new(_currentUser, _tokenService);
+            menuWindow.StartPosition = FormStartPosition.Manual;
+            menuWindow.Location = new Point(this.Location.X, this.Location.Y);
             menuWindow.Show();
             this.Close();
         }
@@ -98,5 +102,10 @@ namespace BattleShipGame_Frontend
             InsertSessions();
         }
 
+        private void SessionsWindow_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            ApplicationLifeTimeService.ShutdownApplication();
+
+        }
     }
 }
