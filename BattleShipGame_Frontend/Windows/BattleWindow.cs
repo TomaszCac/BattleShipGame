@@ -15,6 +15,7 @@ namespace BattleShipGame_Frontend.Windows
         private bool _turn;
         private User _currentUser;
         private bool _gameRunning = true;
+        private bool _playerConnected = false;
         private Session _session;
         public Button changeRotationButton;
         public Button restartBoardButton;
@@ -52,7 +53,24 @@ namespace BattleShipGame_Frontend.Windows
             _hubConnection.On("StartFight", () => { statusLabel.Invoke(StartFight); });
             _hubConnection.On<int, int, bool>("ShipHit", (x, y, isHit) => { this.Invoke(ShipHit, x, y, isHit); });
             _hubConnection.On<bool>("WinGame", (turn) => { this.Invoke(WinGame, turn); });
+            _hubConnection.On<string>("PlayerDisconnected", (note) => {PlayerDisconnected(note); });
 
+        }
+        private void PlayerDisconnected(string note)
+        {
+            this.Invoke(() =>
+            {
+                this.Controls.Clear();
+                _gameRunning = false;
+                statusLabel = new Label();
+                statusLabel.Location = new Point(550, 200);
+                statusLabel.Width = 300;
+                statusLabel.Height = 100;
+                statusLabel.Text = note;
+                this.Controls.Add(statusLabel);
+                this.Controls.Add(quitButton);
+            });
+            
         }
         public async void StartConnection()
         {
@@ -73,9 +91,13 @@ namespace BattleShipGame_Frontend.Windows
         }
         private async Task PlayerConnected(string note) {
             statusLabel.Text = note;
+            _playerConnected = true;
             await Task.Delay(2000);
-            this.Controls.Clear();
-            SetupBoard();
+            if(_gameRunning)
+            {
+                this.Controls.Clear();
+                SetupBoard();
+            }
         }
         private void ShowInitialMessage()
         {
@@ -90,6 +112,15 @@ namespace BattleShipGame_Frontend.Windows
             idLabel.Name = "IdLabel";
             idLabel.Text = $"Session ID: {_session.Id}";
             idLabel.Location = new Point(674, 752);
+            quitButton = new Button();
+            quitButton.Text = "Quit";
+            quitButton.Name = "QuitButton";
+            quitButton.Width = 100;
+            quitButton.Height = 50;
+            quitButton.Location = new Point(12, 735);
+            quitButton.Click += QuitButton_Click;
+            this.Controls.Add(quitButton);
+
         }
         private void SetupBoard()
         {
@@ -233,11 +264,31 @@ namespace BattleShipGame_Frontend.Windows
             this.Controls.Clear();
             SetupBoard();
         }
-        private void QuitButton_Click(object sender, EventArgs e)
+        private async void QuitButton_Click(object sender, EventArgs e)
         {
+            await QuitBattle(ConnectionClient.sharedClient);
             MenuWindow menuWindow = new MenuWindow(_currentUser, _tokenService);
             menuWindow.Show();
             this.Close();
+        }
+        private async Task QuitBattle(HttpClient httpClient)
+        {
+            if (_gameRunning)
+            {
+                _gameRunning = false;
+                if (_playerConnected)
+                {
+                    await _hubConnection.InvokeAsync("Disconnected", _session.Id.ToString(), _currentUser.UserName);
+                    _currentUser.Losses++;
+
+                }
+                await _hubConnection.StopAsync();
+                await httpClient.DeleteAsync(
+                    $"session/end?sessionId={_session.Id}&host={_isHost}"
+                );
+                
+            }
+
         }
         private void ReadyButton_Click(object sender, EventArgs e)
         {
@@ -343,7 +394,7 @@ namespace BattleShipGame_Frontend.Windows
             else
             {
                 statusLabel.Text = "You Lost!";
-                _currentUser.Losses--;
+                _currentUser.Losses++;
             }
             _gameRunning = false;
             this.Controls.Add(statusLabel);
@@ -484,6 +535,13 @@ namespace BattleShipGame_Frontend.Windows
                 int positionX = Convert.ToInt32(stringArray[0]);
                 int positionY = Convert.ToInt32(stringArray[1]);
                 ModifyTile(positionX, positionY, shipSizes[currentShipIndex], shipColors[currentShipIndex], true);
+            }
+        }
+        private async void BattleWindow_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            if(_gameRunning)
+            {
+                await QuitBattle(ConnectionClient.sharedClient);
             }
         }
     }

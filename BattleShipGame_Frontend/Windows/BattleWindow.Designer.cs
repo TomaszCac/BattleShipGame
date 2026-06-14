@@ -37,6 +37,7 @@
             ClientSize = new Size(1360, 795);
             Name = "BattleWindow";
             Text = "BattleWindow";
+            FormClosed += BattleWindow_FormClosed;
             ResumeLayout(false);
         }
 
