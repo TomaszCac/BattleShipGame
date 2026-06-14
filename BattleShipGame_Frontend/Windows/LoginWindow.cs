@@ -7,7 +7,6 @@ using BattleShipGame_Frontend.Configuration;
 using BattleShipGame_Frontend.Models;
 using BattleShipGame_Frontend.Services;
 using BattleShipGame_Frontend.Windows;
-using Microsoft.VisualBasic.ApplicationServices;
 
 namespace BattleShipGame_Frontend
 {

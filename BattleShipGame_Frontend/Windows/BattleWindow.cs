@@ -4,7 +4,6 @@ using BattleShipGame_Frontend.Services;
 using Microsoft.AspNetCore.SignalR.Client;
 using Newtonsoft.Json;
 using System.Net.Http.Json;
-using static System.Collections.Specialized.BitVector32;
 namespace BattleShipGame_Frontend.Windows
 {
     public partial class BattleWindow : Form
@@ -446,6 +445,7 @@ namespace BattleShipGame_Frontend.Windows
                 _currentUser.Losses++;
             }
             _gameRunning = false;
+            this.Controls.Add(quitButton);
             this.Controls.Add(statusLabel);
         }
         /// <summary>
